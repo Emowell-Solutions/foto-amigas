@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Foto Amigas">
+<meta name="theme-color" content="#FDF6F0">
+<title>Foto Amigas 📸</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --rose:#E8637A;--rose-dark:#C44D63;--rose-dim:#E8637A22;
+  --peach:#F4A96A;--peach-dark:#D4834A;
+  --mauve:#C47FA0;--mauve-light:#F2D9E8;  --bg:#FDF6F0;--bg2:#FFF8F4;--bg3:#FCEEE6;
+  --card:#FFFFFF;--border:#F0DDD5;--border2:#E8CFC5;
+  --text:#3D2B2B;--muted:#9E7A75;--muted2:#BDA09A;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text)}
+.app{display:flex;flex-direction:column;height:100%;height:100dvh}
+.status-bar{height:var(--safe-top);background:var(--bg);flex-shrink:0}
+.header{background:var(--bg2);padding:10px 16px;flex-shrink:0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.header-icon{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--rose),var(--mauve));display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.header-title{font-size:17px;font-weight:800;color:var(--text);letter-spacing:-.3px;font-family:'Playfair Display',serif;font-style:italic}
+.header-sub{font-size:11px;color:var(--muted);margin-top:1px;font-family:'Nunito',sans-serif}
+.content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.screen{display:none;padding:12px 12px 24px}.screen.active{display:block}
+.bottom-nav{display:grid;grid-template-columns:repeat(3,1fr);background:var(--bg2);border-top:1px solid var(--border);flex-shrink:0;padding-bottom:var(--safe-bottom)}
+.nav-btn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px 8px;border:none;background:none;color:var(--muted2);font-family:'Nunito',sans-serif;cursor:pointer;transition:color .15s}
+.nav-btn svg{display:block}
+.nav-btn.active{color:var(--rose)}
+.nav-dot{width:4px;height:4px;border-radius:50%;background:var(--rose);opacity:0;transition:opacity .15s}
+.nav-btn.active .nav-dot{opacity:1}
+.card{background:var(--card);border-radius:18px;padding:14px;margin-bottom:10px;border:1px solid var(--border);box-shadow:0 2px 8px rgba(200,120,120,.07)}
+.slabel{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+.prompt-card{background:linear-gradient(135deg,#FFF0F3 0%,#FFF4EC 100%);border-radius:18px;padding:14px;margin-bottom:10px;border:1px solid #F5D5D8;box-shadow:0 2px 10px rgba(232,99,122,.1)}
+.day-badge{display:inline-flex;align-items:center;gap:4px;background:var(--rose);color:#fff;font-size:11px;font-weight:800;padding:4px 12px;border-radius:20px;margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em}
+.prompt-title{font-size:19px;font-weight:700;font-family:'Playfair Display',serif;font-style:italic;color:var(--text);margin-bottom:5px;line-height:1.3}
+.prompt-hint{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:10px}
+.prog-header{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);font-weight:700;margin:8px 0 5px}
+.prog-track{height:6px;background:var(--border);border-radius:20px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--rose),var(--peach));border-radius:20px;transition:width .6s ease}
+.join-row{display:grid;grid-template-columns:1fr 44px 72px;gap:6px;margin-bottom:6px}
+.join-row input{padding:10px 12px;border:1.5px solid var(--border2);border-radius:12px;background:var(--bg);font-size:15px;font-family:'Nunito',sans-serif;width:100%;color:var(--text)}
+.join-row input:focus{outline:none;border-color:var(--rose)}
+.emoji-pick-btn{padding:10px;border:1.5px solid var(--border2);border-radius:12px;background:var(--bg);font-size:20px;cursor:pointer;line-height:1;text-align:center}
+.join-btn{padding:10px 12px;border:none;border-radius:12px;background:var(--rose);color:#fff;font-size:13px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif}
+.join-btn:active{opacity:.75}
+.err{font-size:12px;color:#D94F6A;min-height:16px;margin-bottom:2px;font-weight:700}
+.emoji-picker{background:var(--bg);border:1.5px solid var(--border2);border-radius:16px;padding:10px;margin-bottom:10px;display:none}
+.emoji-grid{display:flex;flex-wrap:wrap;gap:4px}
+.ep-opt{font-size:22px;cursor:pointer;padding:6px 8px;border-radius:10px;border:2px solid transparent;background:none}
+.ep-opt.selected{border-color:var(--rose);background:var(--rose-dim)}
+.p-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.p-chip{display:inline-flex;align-items:center;gap:4px;padding:5px 10px 5px 8px;border-radius:20px;font-size:13px;font-weight:700;background:var(--bg3);border:1.5px solid var(--border);color:var(--text)}
+.p-chip .rem{background:none;border:none;cursor:pointer;font-size:16px;color:var(--muted);line-height:1;padding:0 0 0 2px;font-family:inherit}
+.no-p{font-size:13px;color:var(--muted)}
+.log-fields{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;font-weight:800}
+.field select,.field input[type=number]{padding:10px;border:1.5px solid var(--border2);border-radius:12px;background:var(--bg);font-size:15px;width:100%;font-family:'Nunito',sans-serif;-webkit-appearance:none;color:var(--text)}
+.note-input{width:100%;padding:10px 12px;border:1.5px solid var(--border2);border-radius:12px;background:var(--bg);font-size:14px;font-family:'Nunito',sans-serif;color:var(--text);resize:none;min-height:68px;margin-bottom:10px;line-height:1.6}
+.note-input:focus{outline:none;border-color:var(--rose)}
+.note-input::placeholder{color:var(--muted2)}
+.log-btn{width:100%;padding:14px;border:none;border-radius:14px;background:linear-gradient(135deg,var(--rose),var(--peach));color:#fff;font-size:15px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;transition:opacity .15s;letter-spacing:.01em}
+.log-btn:active{opacity:.8}
+.log-btn.ok{background:var(--rose-dark)}
+.note-feed{display:flex;flex-direction:column;gap:8px}
+.note-item{display:flex;gap:8px;align-items:flex-start;padding:10px 12px;background:var(--bg3);border-radius:14px;border:1px solid var(--border)}
+.note-em{font-size:20px;flex-shrink:0;line-height:1;margin-top:2px}
+.note-body{flex:1;min-width:0}
+.note-meta{display:flex;align-items:baseline;gap:5px;margin-bottom:3px;flex-wrap:wrap}
+.note-name{font-size:12px;font-weight:800;color:var(--text)}
+.note-day{font-size:11px;color:var(--rose);font-weight:700}
+.note-time{font-size:10px;color:var(--muted2)}
+.note-text{font-size:13px;color:var(--muted);line-height:1.55}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:10px 8px;box-shadow:0 1px 5px rgba(200,120,120,.06)}
+.stat-l{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px;font-weight:800}
+.stat-v{font-size:18px;font-weight:800;color:var(--text)}
+.cal-grid-wrap{border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:10px;background:var(--card);box-shadow:0 2px 8px rgba(200,120,120,.07)}
+.cal-head-row{display:grid;background:var(--bg3);border-bottom:1px solid var(--border)}
+.cal-hcell{text-align:center;font-size:10px;font-weight:800;color:var(--muted);padding:6px 2px}
+.cal-body{display:grid}
+.dcell{border-right:1px solid var(--border);border-bottom:1px solid var(--border);min-height:54px;padding:4px;background:var(--bg2);cursor:pointer;transition:background .12s}
+.dcell:active{background:var(--border)}
+.dcell.done{background:#FDE8EE}
+.dcell.future{opacity:.35;cursor:default;pointer-events:none}
+.dcell.istoday:not(.done){outline:2px solid var(--rose);outline-offset:-2px;background:#FFF5F7}
+.dnum{font-size:9px;font-weight:800;color:var(--muted2)}
+.dcell.done .dnum{color:var(--rose-dark)}
+.dcell.istoday .dnum{color:var(--rose)}
+.d-check{font-size:13px;display:block;text-align:center;margin-top:1px}
+.d-who{font-size:8px;color:var(--rose-dark);text-align:center;line-height:1.3;margin-top:1px}
+.d-dot{width:5px;height:5px;border-radius:50%;background:var(--border2);margin:8px auto 0}
+.dcell.istoday:not(.done) .d-dot{background:var(--rose)}
+.pp-section{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:10px;box-shadow:0 2px 8px rgba(200,120,120,.07)}
+.pp-header{display:flex;align-items:center;padding:7px 12px;background:var(--bg3);border-bottom:1px solid var(--border);gap:4px}
+.pp-header-name{font-size:9px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;width:76px;flex-shrink:0}
+.pp-header-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;flex:1;scrollbar-width:none}
+.pp-header-scroll::-webkit-scrollbar{display:none}
+.pp-header-right{font-size:9px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;width:34px;text-align:right;flex-shrink:0}
+.pp-days-header{display:flex;gap:2px;width:max-content}
+.pp-day-tick{width:12px;height:12px;flex-shrink:0;font-size:7px;color:var(--muted2);display:flex;align-items:center;justify-content:center}
+.pp-row{display:flex;align-items:center;gap:4px;padding:8px 12px;border-bottom:1px solid var(--border)}
+.pp-row:last-child{border-bottom:none}
+.pp-who{display:flex;align-items:center;gap:4px;font-size:12px;font-weight:700;width:76px;flex-shrink:0}
+.pp-who .em{font-size:15px;flex-shrink:0}
+.pp-who .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:44px;color:var(--text)}
+.pp-dots-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;flex:1;scrollbar-width:none}
+.pp-dots-scroll::-webkit-scrollbar{display:none}
+.pp-dots{display:flex;gap:2px;width:max-content;padding:2px 0}
+.pp-dot{width:12px;height:12px;border-radius:3px;background:var(--bg3);border:1px solid var(--border);flex-shrink:0}
+.pp-dot.done{background:var(--rose);border-color:var(--rose-dark)}
+.pp-dot.streak-start{border-radius:3px 0 0 3px}
+.pp-dot.streak-mid{border-radius:0}
+.pp-dot.streak-end{border-radius:0 3px 3px 0}
+.pp-dot.tod{border-color:var(--rose)}
+.pp-cnt{font-size:11px;color:var(--muted);text-align:right;white-space:nowrap;width:34px;flex-shrink:0;font-weight:700}
+.streak-badge{display:inline-flex;align-items:center;gap:2px;font-size:9px;background:var(--peach);color:#fff;padding:1px 5px;border-radius:20px;font-weight:800}
+.streak-badge.muted{background:var(--border2);color:var(--muted)}
+.lb-wrap{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(200,120,120,.07)}
+.lb-row{display:grid;grid-template-columns:32px 1fr 50px 40px;align-items:center;gap:4px;padding:11px 12px;border-bottom:1px solid var(--border);font-size:12px}
+.lb-row:last-child{border-bottom:none}
+.lb-hrow{background:var(--bg3);font-size:9px;color:var(--muted);font-weight:800;text-transform:uppercase;letter-spacing:.04em;padding:7px 12px}
+.lb-rank{text-align:center;font-size:17px}
+.lb-name{display:flex;align-items:center;gap:5px;font-weight:700;font-size:13px;overflow:hidden;color:var(--text)}
+.lb-name .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb-days{text-align:right;font-weight:800;font-size:13px;color:var(--rose)}
+.lb-notes{text-align:right;color:var(--muted);font-size:12px;font-weight:700}
+.streak-pill{display:inline-flex;align-items:center;gap:2px;font-size:9px;background:var(--peach);color:#fff;padding:2px 5px;border-radius:20px;white-space:nowrap;font-weight:800}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(80,30,30,.4);z-index:200;align-items:flex-end;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:var(--bg2);border-radius:22px 22px 0 0;width:100%;max-width:480px;max-height:85vh;overflow-y:auto;padding:16px;padding-bottom:calc(16px + var(--safe-bottom));border-top:1px solid var(--border)}
+.modal-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 14px}
+.modal-day-label{font-size:11px;color:var(--rose);font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.modal-ttl{font-size:19px;font-weight:700;font-family:'Playfair Display',serif;font-style:italic;color:var(--text);margin-bottom:4px}
+.modal-hint-txt{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:14px}
+.modal-notes-list{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.modal-close{width:100%;padding:12px;border:1.5px solid var(--border2);border-radius:14px;background:none;color:var(--muted);font-size:14px;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="status-bar"></div>
+  <div class="header">
+    <div class="header-icon">📸</div>
+    <div>
+      <div class="header-title">Foto Amigas</div>
+      <div class="header-sub" id="headerSub">Reto fotográfico · 30 días</div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- INICIO -->
+    <div class="screen active" id="s0">
+      <div class="prompt-card">
+        <div class="day-badge">📷 <span id="dayLabel">Día 1 de 30</span></div>
+        <div class="prompt-title" id="homePTitle">Cargando…</div>
+        <div class="prompt-hint" id="homePHint"></div>
+        <div class="prog-header"><span>Progreso del grupo</span><span id="progPct">0%</span></div>
+        <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+      </div>
+
+      <div class="card">
+        <div class="slabel">Amigas <span id="cntBadge" style="font-weight:400;color:var(--muted2)">(0/10)</span></div>
+        <div class="join-row">
+          <input type="text" id="nameInput" placeholder="Tu nombre" maxlength="20" onkeydown="if(event.key==='Enter')joinChallenge()">
+          <button class="emoji-pick-btn" id="emojiBtn" onclick="togglePicker()">🌸</button>
+          <button class="join-btn" onclick="joinChallenge()">+ Unirse</button>
+        </div>
+        <div class="err" id="joinErr"></div>
+        <div class="emoji-picker" id="emojiPicker"><div class="emoji-grid" id="emojiGrid"></div></div>
+        <div class="p-chips" id="chipWrap"><div class="no-p">Aún no hay amigas — ¡sé la primera! 🌸</div></div>
+      </div>
+
+      <div class="card">
+        <div class="slabel">Publica tu nota de hoy</div>
+        <div class="log-fields">
+          <div class="field"><label>Amiga</label><select id="lName"><option value="">— ¿quién? —</option></select></div>
+          <div class="field"><label>Día #</label><input type="number" id="lDay" min="1" max="30" value="1"></div>
+        </div>
+        <textarea class="note-input" id="lNote" placeholder="Describe tu foto — lo que viste, sentiste, capturaste… ✍️" rows="3"></textarea>
+        <button class="log-btn" id="logBtn" onclick="logIt()">📸 Publicar nota del día</button>
+      </div>
+
+      <div class="card">
+        <div class="slabel">Notas recientes</div>
+        <div class="note-feed" id="noteFeed"><div class="no-p">Todavía no hay notas — ¡anímate!</div></div>
+      </div>
+    </div>
+
+    <!-- CALENDARIO -->
+    <div class="screen" id="s1">
+      <div class="stats-row">
+        <div class="stat"><div class="stat-l">Días foto</div><div class="stat-v" id="csDone">0</div></div>
+        <div class="stat"><div class="stat-l">Notas</div><div class="stat-v" id="csNotes">0</div></div>
+        <div class="stat"><div class="stat-l">Racha</div><div class="stat-v" id="csStreak">0</div></div>
+        <div class="stat"><div class="stat-l">Avance</div><div class="stat-v" id="csPct">0%</div></div>
+      </div>
+      <div class="cal-grid-wrap">
+        <div class="cal-head-row" id="calHead"></div>
+        <div class="cal-body" id="calBody"></div>
+      </div>
+      <div class="slabel">Racha por amiga</div>
+      <div class="pp-section">
+        <div class="pp-header">
+          <div class="pp-header-name">Amiga</div>
+          <div class="pp-header-scroll"><div class="pp-days-header" id="ppDaysHeader"></div></div>
+          <div class="pp-header-right">Hecho</div>
+        </div>
+        <div id="ppBody"></div>
+      </div>
+    </div>
+
+    <!-- MARCADOR -->
+    <div class="screen" id="s2">
+      <div class="stats-row">
+        <div class="stat"><div class="stat-l">Amigas</div><div class="stat-v" id="lbCount">0</div></div>
+        <div class="stat"><div class="stat-l">Días hechos</div><div class="stat-v" id="lbDone">0</div></div>
+        <div class="stat"><div class="stat-l">Notas</div><div class="stat-v" id="lbNotes">0</div></div>
+        <div class="stat"><div class="stat-l">Líder</div><div class="stat-v" id="lbLeader" style="font-size:24px">—</div></div>
+      </div>
+      <div class="lb-wrap">
+        <div class="lb-row lb-hrow">
+          <div></div><div>Amiga</div><div style="text-align:right">Días</div><div style="text-align:right">Notas</div>
+        </div>
+        <div id="lbBody"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="nav-btn active" onclick="goTo(0)" id="nb0" aria-label="Inicio">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12L12 3l9 9"/><path d="M9 21V12h6v9"/></svg>
+      <div class="nav-dot"></div>
+    </button>
+    <button class="nav-btn" onclick="goTo(1)" id="nb1" aria-label="Calendario">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M16 3v4M8 3v4M4 11h16"/><rect x="8" y="15" width="2" height="2" rx=".5" fill="currentColor" stroke="none"/><rect x="11" y="15" width="2" height="2" rx=".5" fill="currentColor" stroke="none"/><rect x="14" y="15" width="2" height="2" rx=".5" fill="currentColor" stroke="none"/></svg>
+      <div class="nav-dot"></div>
+    </button>
+    <button class="nav-btn" onclick="goTo(2)" id="nb2" aria-label="Marcador">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z"/></svg>
+      <div class="nav-dot"></div>
+    </button>
+  </nav>
+</div>
+
+<!-- DETALLE DEL DÍA (hoja inferior) -->
+<div class="modal-bg" id="modalBg" onclick="closeModalBg(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-day-label" id="modalDayLbl"></div>
+    <div class="modal-ttl" id="modalTtl"></div>
+    <div class="modal-hint-txt" id="modalHintTxt"></div>
+    <div class="modal-notes-list" id="modalNotesList"></div>
+    <button class="modal-close" onclick="closeModal()">Cerrar</button>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDHiAlUVwB52YF5F3AOSzGW3eMCFZaiOXM",
+  authDomain: "foto-amigas.firebaseapp.com",
+  projectId: "foto-amigas",
+  storageBucket: "foto-amigas.firebasestorage.app",
+  messagingSenderId: "255446485645",
+  appId: "1:255446485645:web:1bcaff740e37687f3670c4"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const TOTAL_DAYS = 30;
+const COLS = 6;
+const EMOJIS = ['🌸','🌺','💃','🌟','🦋','🌙','🌻','🎀','✨','🦊','🐝','🌈','🍀','🎭','🌊','🦚','🌴','🎨','🫶','🪷'];
+const PROMPTS = [
+  {title:'Tu luz de la mañana',hint:'Captura la primera luz que ves hoy — ventana, lámpara, amanecer o el brillo de tu celular.'},
+  {title:'Algo amarillo',hint:'Busca el amarillo donde sea — comida, flores, un post-it, ¡lo que sea!'},
+  {title:'Manos en acción',hint:'Tus manos haciendo algo — cocinando, escribiendo, tejiendo, sosteniendo una taza.'},
+  {title:'Una textura que te encante',hint:'Acércate. Encuentra una superficie interesante y captúrala de cerca.'},
+  {title:'Lo que te hizo sonreír hoy',hint:'Cualquier cosa — grande o pequeña — que te dio un momento de alegría.'},
+  {title:'Tu rincón favorito en casa',hint:'El lugar al que siempre vuelves. Muéstranos por qué lo amas.'},
+  {title:'Algo en movimiento',hint:'Agua corriendo, tráfico, tu mascota corriendo, cortinas con viento.'},
+  {title:'La vista desde donde estás sentada',hint:'No te muevas — solo mira hacia arriba y fotografía exactamente lo que tienes enfrente.'},
+  {title:'Una planta o algo verde',hint:'En la naturaleza, en tu balcón, en una maceta — el verde en cualquier forma.'},
+  {title:'Sombras y formas',hint:'Encuentra una sombra y conviértela en el sujeto. ¡Abstracto e interesante!'},
+  {title:'Algo de lo que estás orgullosa',hint:'Un objeto, un espacio, un proyecto — algo que represente tu trabajo o tus valores.'},
+  {title:'Desayuno o tu primera comida',hint:'¿Qué te da energía? Captúralo antes de comerlo.'},
+  {title:'Una puerta o ventana',hint:'Abierta o cerrada — ¿qué enmarca? ¿Qué hay del otro lado?'},
+  {title:'Tu ciudad a esta hora',hint:'Sal o asómate. ¿Cómo se ve tu ciudad en este momento?'},
+  {title:'Algo viejo',hint:'Una antigüedad, un objeto gastado, algo con historia y muchas historias que contar.'},
+  {title:'Un patrón que llame tu atención',hint:'Azulejos, tela, arquitectura, naturaleza — encuentra un patrón que se repita.'},
+  {title:'Autorretrato, ¡a tu estilo!',hint:'Puede ser tu reflejo, tu sombra, tus pies — ¡o un selfie completo!'},
+  {title:'Algo azul',hint:'Tu objeto azul de hoy. El cielo, una tela, cualquier cosa de la familia del azul.'},
+  {title:'Un momento de calma',hint:'Encuentra un rincón tranquilo. ¿Cómo se ve la paz para ti hoy?'},
+  {title:'Tu libro o objeto favorito',hint:'Algo que te llevarías contigo si tuvieras que salir rápido.'},
+  {title:'Antojo callejero o sabor local',hint:'Algo comestible que se sienta completamente de tu lugar en el mundo.'},
+  {title:'Alguien o algo esperando',hint:'Una mascota en la puerta, una tetera hirviendo, alguien en la parada del camión.'},
+  {title:'La noche en tu mundo',hint:'Después de oscurecer. Faroles, una ventana iluminada, velas — la noche como tú la ves.'},
+  {title:'Un pasatiempo en acción',hint:'Algo que amas hacer. Muéstranos cómo se ve a la mitad del proceso.'},
+  {title:'Tu cielo de hoy',hint:'Mira hacia arriba. ¿Qué está pasando sobre ti ahora mismo? ¿Nubes, sol, estrellas?'},
+  {title:'Un pequeño tesoro',hint:'Un objeto diminuto y significativo — un anillo, una moneda, una piedra, un recuerdo.'},
+  {title:'Algo que huela maravilloso',hint:'No podemos mandar el olor, así que muéstranos la fuente — café, pan, flores, lluvia.'},
+  {title:'Antes y ahora',hint:'Encuentra una foto antigua y recréala — o muestra un lugar en su estado actual.'},
+  {title:'Un regalo de la tierra',hint:'Algo natural: una hoja, una piedra, una flor, una fruta.'},
+  {title:'Tu mejor foto del mes',hint:'¡Día 30! Regresa y elige tu foto más querida de estos 30 días. Compártela con una reflexión.'},
+];
+
+function sk(k){return 'foto30_sel_'+k}
+function ldSel(k,def){try{const v=localStorage.getItem(sk(k));return v||def}catch{return def}}
+function svSel(k,v){try{localStorage.setItem(sk(k),v)}catch{}}
+
+let participants=[];
+let notes=[];
+let selectedEmoji=ldSel('emoji','\ud83c\udf38');
+let currentScreen=0;
+
+const START=new Date('2026-06-17');
+const now=new Date();
+const todayDay=Math.max(1,Math.min(TOTAL_DAYS,Math.floor((now-START)/86400000)+1));
+
+document.getElementById('dayLabel').textContent='D\u00eda '+todayDay+' de '+TOTAL_DAYS;
+document.getElementById('headerSub').textContent='D\u00eda '+todayDay+' de '+TOTAL_DAYS+' \u00b7 Reto fotogr\u00e1fico';
+document.getElementById('lDay').value=todayDay;
+document.getElementById('emojiBtn').textContent=selectedEmoji;
+
+// Firestore listeners en tiempo real
+onSnapshot(query(collection(db,'fa_participants'), orderBy('joinedAt')), snap=>{
+  participants=snap.docs.map(d=>({id:d.id,...d.data()}));
+  renderParticipants();
+  renderAll();
+}, err=>console.warn('participants:',err));
+
+onSnapshot(query(collection(db,'fa_notes'), orderBy('ts','desc')), snap=>{
+  notes=snap.docs.map(d=>({id:d.id,...d.data()}));
+  renderAll();
+}, err=>console.warn('notes:',err));
+
+window.goTo=function(i){
+  document.querySelectorAll('.screen').forEach((s,j)=>s.classList.toggle('active',j===i));
+  document.querySelectorAll('.nav-btn').forEach((b,j)=>b.classList.toggle('active',j===i));
+  currentScreen=i;
+  if(i===1)renderCalendar();
+  if(i===2)renderLeaderboard();
+};
+
+function buildEmojiGrid(){
+  document.getElementById('emojiGrid').innerHTML=EMOJIS.map(e=>
+    '<button class="ep-opt'+(e===selectedEmoji?' selected':'')+'" onclick="pickEmoji(\''+e+'\')">'+e+'</button>'
+  ).join('');
+}
+window.togglePicker=function(){
+  const p=document.getElementById('emojiPicker');
+  p.style.display=p.style.display==='block'?'none':'block';
+  buildEmojiGrid();
+};
+window.pickEmoji=function(e){
+  selectedEmoji=e;
+  svSel('emoji',e);
+  document.getElementById('emojiBtn').textContent=e;
+  document.getElementById('emojiPicker').style.display='none';
+};
+
+window.joinChallenge=async function(){
+  const inp=document.getElementById('nameInput');
+  const err=document.getElementById('joinErr');
+  const name=inp.value.trim();
+  err.textContent='';
+  if(!name){err.textContent='Por favor escribe tu nombre.';return;}
+  if(participants.length>=10){err.textContent='\u00a1M\u00e1ximo 10 amigas alcanzado!';return;}
+  if(participants.find(p=>p.name.toLowerCase()===name.toLowerCase())){err.textContent='\u00a1Ese nombre ya est\u00e1 en uso!';return;}
+  try{
+    await addDoc(collection(db,'fa_participants'),{name,emoji:selectedEmoji,joinedAt:Date.now()});
+    inp.value='';
+  }catch(e){err.textContent='Error de conexi\u00f3n, intenta de nuevo.';}
+};
+
+window.removeP=async function(id,name){
+  if(!confirm('\u00bfEliminar a '+name+'?'))return;
+  await deleteDoc(doc(db,'fa_participants',id));
+  const toDelete=notes.filter(n=>n.name===name);
+  for(const n of toDelete) await deleteDoc(doc(db,'fa_notes',n.id));
+};
+
+function renderParticipants(){
+  const wrap=document.getElementById('chipWrap');
+  const sel=document.getElementById('lName');
+  document.getElementById('cntBadge').textContent='('+participants.length+'/10)';
+  if(!participants.length){
+    wrap.innerHTML='<div class="no-p">A\u00fan no hay amigas \u2014 \u00a1s\u00e9 la primera! \ud83c\udf38</div>';
+    sel.innerHTML='<option value="">\u2014 \u00fanete primero \u2014</option>';
+    return;
+  }
+  wrap.innerHTML=participants.map(p=>
+    '<div class="p-chip"><span>'+p.emoji+'</span><span>'+p.name+'</span><button class="rem" onclick="removeP(\''+p.id+'\',\''+p.name.replace(/'/g,"\\'")+'\')">\u00d7</button></div>'
+  ).join('');
+  const prev=sel.value;
+  sel.innerHTML='<option value="">\u2014 \u00bfqui\u00e9n? \u2014</option>'+
+    participants.map(p=>'<option value="'+p.name+'"'+(p.name===prev?' selected':'')+'>'+p.emoji+' '+p.name+'</option>').join('');
+}
+
+window.logIt=async function(){
+  const name=document.getElementById('lName').value;
+  const day=parseInt(document.getElementById('lDay').value)||todayDay;
+  const text=document.getElementById('lNote').value.trim();
+  if(!name){alert('\u00a1Primero elige tu nombre!');return;}
+  const p=participants.find(p=>p.name===name);
+  if(!p)return;
+  const btn=document.getElementById('logBtn');
+  btn.disabled=true;
+  try{
+    await addDoc(collection(db,'fa_notes'),{name,emoji:p.emoji,day,text:text||'\ud83d\udcf7',ts:Date.now()});
+    document.getElementById('lNote').value='';
+    btn.classList.add('ok');
+    btn.textContent='\u2705 \u00a1D\u00eda '+day+' publicado!';
+    setTimeout(()=>{btn.classList.remove('ok');btn.textContent='\ud83d\udcf8 Publicar nota del d\u00eda';btn.disabled=false;},2500);
+  }catch(e){
+    alert('Error al publicar. Revisa tu conexi\u00f3n.');
+    btn.disabled=false;
+  }
+};
+
+function getDoneMap(){
+  const m={};
+  participants.forEach(p=>{m[p.name]=new Set();});
+  notes.forEach(n=>{if(m[n.name])m[n.name].add(n.day);});
+  return m;
+}
+function anyDone(map,day){return participants.some(p=>map[p.name]&&map[p.name].has(day));}
+function whoOnDay(map,day){return participants.filter(p=>map[p.name]&&map[p.name].has(day));}
+function personalStreak(doneSet){
+  let best=0,cur=0,current=0;
+  for(let d=1;d<=TOTAL_DAYS;d++){
+    if(doneSet.has(d)){cur++;best=Math.max(best,cur);if(d<=todayDay)current=cur;}
+    else{if(d<=todayDay)current=0;cur=0;}
+  }
+  return{best,current};
+}
+function bestGroupStreak(map){
+  let best=0,cur=0;
+  for(let d=1;d<=TOTAL_DAYS;d++){if(anyDone(map,d)){cur++;best=Math.max(best,cur);}else cur=0;}
+  return best;
+}
+
+function renderAll(){
+  const map=getDoneMap();
+  let done=0;
+  for(let d=1;d<=TOTAL_DAYS;d++){if(anyDone(map,d))done++;}
+  const pct=Math.round((done/TOTAL_DAYS)*100);
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('progPct').textContent=pct+'%';
+  const p=PROMPTS[todayDay-1];
+  document.getElementById('homePTitle').textContent=p.title;
+  document.getElementById('homePHint').textContent=p.hint;
+  renderNoteFeed();
+  if(currentScreen===1)renderCalendar();
+  if(currentScreen===2)renderLeaderboard();
+}
+
+function renderNoteFeed(){
+  const feed=document.getElementById('noteFeed');
+  const recent=notes.slice(0,12);
+  if(!recent.length){feed.innerHTML='<div class="no-p">Todav\u00eda no hay notas \u2014 \u00a1an\u00edmate! \ud83c\udf38</div>';return;}
+  feed.innerHTML=recent.map(n=>{
+    const d=new Date(n.ts);
+    const t=d.toLocaleDateString('es',{day:'numeric',month:'short'});
+    const pr=PROMPTS[n.day-1];
+    return'<div class="note-item"><div class="note-em">'+n.emoji+'</div><div class="note-body"><div class="note-meta"><span class="note-name">'+n.name+'</span><span class="note-day">\u00b7 D\u00eda '+n.day+' \u2014 '+(pr?pr.title:'')+'</span><span class="note-time">'+t+'</span></div><div class="note-text">'+n.text+'</div></div></div>';
+  }).join('');
+}
+
+function renderCalendar(){
+  const map=getDoneMap();
+  let done=0;
+  for(let d=1;d<=TOTAL_DAYS;d++){if(anyDone(map,d))done++;}
+  document.getElementById('csDone').textContent=done;
+  document.getElementById('csNotes').textContent=notes.length;
+  document.getElementById('csStreak').textContent=bestGroupStreak(map);
+  document.getElementById('csPct').textContent=Math.round((done/TOTAL_DAYS)*100)+'%';
+  const calHead=document.getElementById('calHead');
+  calHead.style.gridTemplateColumns='repeat('+COLS+',1fr)';
+  calHead.innerHTML=Array.from({length:COLS},(_,i)=>'<div class="cal-hcell">Sem '+(i+1)+'</div>').join('');
+  const body=document.getElementById('calBody');
+  body.style.gridTemplateColumns='repeat('+COLS+',1fr)';
+  body.innerHTML='';
+  for(let d=1;d<=TOTAL_DAYS;d++){
+    const isDone=anyDone(map,d),who=whoOnDay(map,d);
+    const isToday=d===todayDay,isFuture=d>todayDay;
+    const cell=document.createElement('div');
+    cell.className='dcell'+(isDone?' done':'')+(isToday?' istoday':'')+(isFuture&&!isDone?' future':'');
+    if(d>TOTAL_DAYS-COLS)cell.style.borderBottom='none';
+    if(d%COLS===0)cell.style.borderRight='none';
+    if(isDone){
+      cell.innerHTML='<div class="dnum">'+d+'</div><span class="d-check">\ud83d\udcf7</span><div class="d-who">'+who.map(p=>p.emoji).join('')+'</div>';
+      cell.onclick=(function(day){return function(){openDayModal(day);};})(d);
+    }else{
+      cell.innerHTML='<div class="dnum">'+d+'</div><div class="d-dot"></div>';
+      if(!isFuture)cell.onclick=(function(day){return function(){openDayModal(day);};})(d);
+    }
+    body.appendChild(cell);
+  }
+  const hdr=document.getElementById('ppDaysHeader');
+  hdr.innerHTML='';
+  for(let d=1;d<=TOTAL_DAYS;d++){
+    const t=document.createElement('div');
+    t.className='pp-day-tick';
+    t.textContent=d%5===0?d:'';
+    hdr.appendChild(t);
+  }
+  const ppBody=document.getElementById('ppBody');
+  if(!participants.length){ppBody.innerHTML='<div style="padding:1rem;font-size:13px;color:var(--muted)">Un\u00e9te para ver las rachas.</div>';return;}
+  ppBody.innerHTML='';
+  participants.forEach(p=>{
+    const doneSet=map[p.name]||new Set();
+    const cnt=doneSet.size;
+    const str=personalStreak(doneSet);
+    let dots='';
+    for(let d=1;d<=TOTAL_DAYS;d++){
+      const isDone=doneSet.has(d),isToday=d===todayDay&&!isDone;
+      const prev=doneSet.has(d-1),next=doneSet.has(d+1);
+      let cls='pp-dot';
+      if(isDone){cls+=' done';if(prev&&next)cls+=' streak-mid';else if(prev)cls+=' streak-end';else if(next)cls+=' streak-start';}
+      if(isToday)cls+=' tod';
+      dots+='<div class="'+cls+'"></div>';
+    }
+    const badge=str.current>=2?'<span class="streak-badge">\ud83d\udd25'+str.current+'</span>':(str.best>=2?'<span class="streak-badge muted">mejor '+str.best+'</span>':'');
+    const row=document.createElement('div');
+    row.className='pp-row';
+    row.innerHTML='<div class="pp-who"><span class="em">'+p.emoji+'</span><span class="nm">'+p.name+'</span>'+badge+'</div><div class="pp-dots-scroll"><div class="pp-dots">'+dots+'</div></div><div class="pp-cnt">'+cnt+'/30</div>';
+    ppBody.appendChild(row);
+  });
+  setTimeout(()=>{
+    const scrollers=document.querySelectorAll('.pp-dots-scroll');
+    const headerScroll=document.querySelector('.pp-header-scroll');
+    scrollers.forEach(s=>{s.addEventListener('scroll',()=>{if(headerScroll)headerScroll.scrollLeft=s.scrollLeft;},{passive:true});});
+    if(headerScroll){headerScroll.addEventListener('scroll',()=>{scrollers.forEach(s=>s.scrollLeft=headerScroll.scrollLeft);},{passive:true});}
+  },50);
+}
+
+function renderLeaderboard(){
+  const map=getDoneMap();
+  const stats=participants.map(p=>{
+    const doneSet=map[p.name]||new Set();
+    const noteCount=notes.filter(n=>n.name===p.name).length;
+    const str=personalStreak(doneSet);
+    return{p,days:doneSet.size,noteCount,current:str.current};
+  }).sort((a,b)=>b.days-a.days||b.noteCount-a.noteCount);
+  let totalDone=0;
+  for(let d=1;d<=TOTAL_DAYS;d++){if(anyDone(map,d))totalDone++;}
+  document.getElementById('lbCount').textContent=participants.length;
+  document.getElementById('lbDone').textContent=totalDone;
+  document.getElementById('lbNotes').textContent=notes.length;
+  document.getElementById('lbLeader').textContent=stats.length?stats[0].p.emoji:'\u2014';
+  const medals=['\ud83e\udd47','\ud83e\udd48','\ud83e\udd49'];
+  const lbBody=document.getElementById('lbBody');
+  if(!stats.length){lbBody.innerHTML='<div style="padding:1.5rem;text-align:center;font-size:13px;color:var(--muted)">\u00a1A\u00fan no hay amigas!</div>';return;}
+  lbBody.innerHTML=stats.map((s,i)=>
+    '<div class="lb-row"><div class="lb-rank">'+(medals[i]||i+1)+'</div><div class="lb-name"><span style="font-size:18px">'+s.p.emoji+'</span><span class="nm">'+s.p.name+'</span>'+(s.current>=2?'<span class="streak-pill">\ud83d\udd25'+s.current+'</span>':'')+'</div><div class="lb-days">'+s.days+'</div><div class="lb-notes">'+s.noteCount+'</div></div>'
+  ).join('');
+}
+
+window.openDayModal=function(day){
+  const p=PROMPTS[day-1];
+  document.getElementById('modalDayLbl').textContent='D\u00eda '+day+' de 30';
+  document.getElementById('modalTtl').textContent=p.title;
+  document.getElementById('modalHintTxt').textContent=p.hint;
+  const dayNotes=notes.filter(n=>n.day===day);
+  const mn=document.getElementById('modalNotesList');
+  if(!dayNotes.length){mn.innerHTML='<div class="no-p" style="padding:4px 0">A\u00fan no hay notas para este d\u00eda.</div>';}
+  else{mn.innerHTML=dayNotes.map(n=>{
+    const d=new Date(n.ts);
+    const t=d.toLocaleDateString('es',{day:'numeric',month:'short'});
+    return'<div class="note-item"><div class="note-em">'+n.emoji+'</div><div class="note-body"><div class="note-meta"><span class="note-name">'+n.name+'</span><span class="note-time">'+t+'</span></div><div class="note-text">'+n.text+'</div></div></div>';
+  }).join('');}
+  document.getElementById('modalBg').classList.add('open');
+};
+window.closeModal=function(){document.getElementById('modalBg').classList.remove('open');};
+window.closeModalBg=function(e){if(e.target===document.getElementById('modalBg'))closeModal();};
+
+buildEmojiGrid();
+</script>
+</body>
+</html>
